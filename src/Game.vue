@@ -10,7 +10,7 @@ import GameHeader from "@/components/GameHeader"
 import GameBoard from "@/components/GameBoard"
 
 export default {
-  name: 'App',
+  name: 'Game',
   components: {
     GameHeader,
     GameBoard
@@ -19,12 +19,27 @@ export default {
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #E8F3F1;
+}
+
+#game {
+  width: 100%;
+  max-width: 760px;
+  min-height: 300px;
+  font-family: 'Poppins', sans-serif;
+  background-color: #fff;
 }
 </style>
