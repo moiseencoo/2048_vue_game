@@ -1,6 +1,6 @@
 <template>
     <div class="game-tile">
-        {{ value }}
+        {{ getValue }}
     </div>
 </template>
 
@@ -9,6 +9,11 @@
         name: "gameTile",
         props: {
             value: Number
+        },
+        computed: {
+            getValue() {
+                return this.value > 0 ? value : null
+            }
         }
     }
 </script>
