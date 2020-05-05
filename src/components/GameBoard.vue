@@ -12,6 +12,7 @@
 
 <script>
 import GameTile from "@/components/GameTile";
+import { game_helpers } from "@/mixins/helpers.js";
 
 export default {
   name: "gameBoard",
@@ -23,6 +24,7 @@ export default {
       [0, 0, 0, 0],
     ],
   }),
+  mixins: [game_helpers],
   created() {
     this.initializeGame();
   },
@@ -32,7 +34,6 @@ export default {
   beforeDestroy() {
     window.removeEventListener("keydown", this.userPressedKey.bind(this));
   },
-  computed: {},
   methods: {
     initializeGame() {
       this.addNumber();
@@ -41,16 +42,12 @@ export default {
     addNumber() {
       let randomCol = this.generateRandomNumber();
       let randomRow = this.generateRandomNumber();
-      
+
       if (this.matrix[randomCol][randomRow] == 0) {
-        this.matrix[randomCol][randomRow] = 2
+        this.matrix[randomCol][randomRow] = 2;
       } else {
         this.addNumber();
       }
-
-    },
-    generateRandomNumber() {
-      return Math.floor(Math.random() * 4);
     },
     userPressedKey(event) {
       switch (event.keyCode) {
@@ -111,29 +108,6 @@ export default {
       });
 
       this.matrix = this.rotateMatrix(newMatrix);
-    },
-    mergeTiles(array) {
-      return array
-        .map((element, index, arr) => {
-          if (element == arr[++index]) {
-            arr[index] = 0;
-            return element * 2;
-          } else {
-            return element;
-          }
-        })
-        .filter((element) => element > 0);
-    },
-    rotateMatrix(mtr) {
-      let rotatedMatrix = [];
-      for (let i = 0; i < 4; i++) {
-        let rotatedRow = [];
-        for (let j = 0; j < 4; j++) {
-          rotatedRow.push(mtr[j][i]);
-        }
-        rotatedMatrix.push(rotatedRow);
-      }
-      return rotatedMatrix;
     },
   },
   components: {
