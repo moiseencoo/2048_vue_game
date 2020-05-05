@@ -12,7 +12,7 @@
         },
         computed: {
             getValue() {
-                return this.value > 0 ? value : null
+                return this.value > 0 ? this.value : null
             }
         }
     }

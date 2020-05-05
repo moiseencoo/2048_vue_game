@@ -17,10 +17,10 @@ export default {
   name: "gameBoard",
   data: () => ({
     matrix: [
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
+      [0, 2, 4, 2],
+      [2, 4, 4, 0],
+      [0, 16, 0, 16],
+      [8, 0, 2, 2],
     ],
   }),
   created() {
@@ -32,6 +32,16 @@ export default {
   beforeDestroy() {
     window.removeEventListener("keydown", this.userPressedKey.bind(this));
   },
+  computed: {
+    getNumbersFromRows() {
+        // return this.matrix.map((row) => {
+
+        // })
+    },
+    getNumbersFromColumns() {
+
+    }
+  },
   methods: {
     initializeGame() {
       this.addNumber();
@@ -39,17 +49,36 @@ export default {
     },
     addNumber() {},
     userPressedKey(event) {
-      if (event.keyCode >= 37 && event.keyCode <= 40) {
-        this.slideLeft();
+      switch (event.keyCode) {
+        case 37:
+          this.slideLeft();
+          break;
+        case 38:
+          this.slideTop();
+          break;
+        case 39:
+          this.slideRight();
+          break;
+        case 40:
+          this.slideBottom();
+          break;
       }
     },
-
     slideLeft() {
-      let merged = this.mergeTiles([2, 2, 4, 2]);
-      console.log(merged);
+      this.matrix = this.matrix.map((row) => {
+          let merged =  this.mergeTiles(row.filter((num) => num > 0))        
+          return merged.concat(row.fill(0, merged.length, 4).slice(merged.length, 4))
+      })
     },
-    slideTop() {},
-    slideRight() {},
+    slideTop() {
+
+    },
+    slideRight() {
+      this.matrix = this.matrix.map((row) => {
+          let merged =  this.mergeTiles(row.filter((num) => num > 0))  
+          return row.fill(0, merged.length, 4).slice(merged.length, 4).concat(merged);
+      })
+    },
     slideBottom() {},
     mergeTiles(array) {
       return array
