@@ -40,8 +40,28 @@ export default {
     addNumber() {},
     userPressedKey(event) {
       if (event.keyCode >= 37 && event.keyCode <= 40) {
-          console.log("let's game it out")
+        this.slideLeft();
       }
+    },
+
+    slideLeft() {
+      let merged = this.mergeTiles([2, 2, 4, 2]);
+      console.log(merged);
+    },
+    slideTop() {},
+    slideRight() {},
+    slideBottom() {},
+    mergeTiles(array) {
+      return array
+        .map((element, index, arr) => {
+          if (element == arr[++index]) {
+            arr[index] = 0;
+            return element * 2;
+          } else {
+            return element;
+          }
+        })
+        .filter((element) => element > 0);
     },
   },
   components: {
