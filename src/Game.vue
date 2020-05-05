@@ -37,9 +37,8 @@ body {
 
 #game {
   width: 100%;
-  max-width: 760px;
+  max-width: 500px;
   min-height: 300px;
   font-family: 'Poppins', sans-serif;
-  background-color: #fff;
 }
 </style>
