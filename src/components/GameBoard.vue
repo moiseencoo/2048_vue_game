@@ -17,10 +17,10 @@ export default {
   name: "gameBoard",
   data: () => ({
     matrix: [
-      [0, 2, 4, 2],
-      [2, 4, 4, 0],
-      [0, 16, 0, 16],
-      [8, 0, 2, 2],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
     ],
   }),
   created() {
@@ -32,22 +32,26 @@ export default {
   beforeDestroy() {
     window.removeEventListener("keydown", this.userPressedKey.bind(this));
   },
-  computed: {
-    getNumbersFromRows() {
-        // return this.matrix.map((row) => {
-
-        // })
-    },
-    getNumbersFromColumns() {
-
-    }
-  },
+  computed: {},
   methods: {
     initializeGame() {
       this.addNumber();
       this.addNumber();
     },
-    addNumber() {},
+    addNumber() {
+      let randomCol = this.generateRandomNumber();
+      let randomRow = this.generateRandomNumber();
+      
+      if (this.matrix[randomCol][randomRow] == 0) {
+        this.matrix[randomCol][randomRow] = 2
+      } else {
+        this.addNumber();
+      }
+
+    },
+    generateRandomNumber() {
+      return Math.floor(Math.random() * 4);
+    },
     userPressedKey(event) {
       switch (event.keyCode) {
         case 37:
@@ -66,20 +70,48 @@ export default {
     },
     slideLeft() {
       this.matrix = this.matrix.map((row) => {
-          let merged =  this.mergeTiles(row.filter((num) => num > 0))        
-          return merged.concat(row.fill(0, merged.length, 4).slice(merged.length, 4))
-      })
-    },
-    slideTop() {
-
+        let merged = this.mergeTiles(row.filter((num) => num > 0));
+        return merged.concat(row.fill(0).slice(merged.length, 4));
+      });
     },
     slideRight() {
       this.matrix = this.matrix.map((row) => {
-          let merged =  this.mergeTiles(row.filter((num) => num > 0))  
-          return row.fill(0, merged.length, 4).slice(merged.length, 4).concat(merged);
-      })
+        let merged = this.mergeTiles(
+          row.filter((num) => num > 0).reverse()
+        ).reverse();
+        return row
+          .fill(0)
+          .slice(merged.length, 4)
+          .concat(merged);
+      });
     },
-    slideBottom() {},
+    slideTop() {
+      let newMatrix = this.rotateMatrix(this.matrix).map((row) => {
+        let merged = this.mergeTiles(row.filter((num) => num > 0));
+        return merged.concat(row.fill(0).slice(merged.length, 4));
+      });
+
+      this.matrix = this.rotateMatrix(newMatrix);
+
+      // let result = this.matrix.forEach((row, r_index, array) => {
+      //   return array.map((column, c_index) => {
+      //     return array[c_index][r_index]
+      //   })
+      // })
+    },
+    slideBottom() {
+      let newMatrix = this.rotateMatrix(this.matrix).map((row) => {
+        let merged = this.mergeTiles(
+          row.filter((num) => num > 0).reverse()
+        ).reverse();
+        return row
+          .fill(0)
+          .slice(merged.length, 4)
+          .concat(merged);
+      });
+
+      this.matrix = this.rotateMatrix(newMatrix);
+    },
     mergeTiles(array) {
       return array
         .map((element, index, arr) => {
@@ -91,6 +123,17 @@ export default {
           }
         })
         .filter((element) => element > 0);
+    },
+    rotateMatrix(mtr) {
+      let rotatedMatrix = [];
+      for (let i = 0; i < 4; i++) {
+        let rotatedRow = [];
+        for (let j = 0; j < 4; j++) {
+          rotatedRow.push(mtr[j][i]);
+        }
+        rotatedMatrix.push(rotatedRow);
+      }
+      return rotatedMatrix;
     },
   },
   components: {
