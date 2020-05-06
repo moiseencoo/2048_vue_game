@@ -8,6 +8,7 @@
         v-on:win="hasWon = true"
       ></game-tile>
     </div>
+    {{ hasLost }}
     <h2 v-if="hasWon">You Win!</h2>
   </div>
 </template>
@@ -20,12 +21,13 @@ export default {
   name: "gameBoard",
   data: () => ({
     matrix: [
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
+      [16, 256, 16, 256],
+      [0, 16, 0, 16],
+      [0, 256, 16, 0],
+      [0, 16, 0, 16],
     ],
     hasWon: false,
+    hasLost: false,
   }),
   mixins: [game_helpers],
   created() {
@@ -46,7 +48,7 @@ export default {
       let randomCol = this.generateRandomNumber();
       let randomRow = this.generateRandomNumber();
 
-      if (this.matrix[randomCol][randomRow] == 0) {
+      if (this.matrix[randomCol][randomRow] === 0) {
         this.matrix[randomCol][randomRow] = 2;
       } else {
         this.addNumber();
@@ -56,19 +58,15 @@ export default {
       switch (event.keyCode) {
         case 37:
           this.slideLeft();
-          this.addNumber();
           break;
         case 38:
           this.slideTop();
-          this.addNumber();
           break;
         case 39:
           this.slideRight();
-          this.addNumber();
           break;
         case 40:
           this.slideBottom();
-          this.addNumber();
           break;
       }
     },
@@ -77,6 +75,12 @@ export default {
         let merged = this.mergeTiles(row.filter((num) => num > 0));
         return merged.concat(row.fill(0).slice(merged.length, 4));
       });
+
+      if (!this.isGameOver()) {
+        this.addNumber();
+      } else {
+        this.hasLost = true;
+      }
     },
     slideRight() {
       this.matrix = this.matrix.map((row) => {
@@ -88,6 +92,12 @@ export default {
           .slice(merged.length, 4)
           .concat(merged);
       });
+
+      if (!this.isGameOver()) {
+        this.addNumber();
+      } else {
+        this.hasLost = true;
+      }
     },
     slideTop() {
       let newMatrix = this.rotateMatrix(this.matrix).map((row) => {
@@ -97,11 +107,11 @@ export default {
 
       this.matrix = this.rotateMatrix(newMatrix);
 
-      // let result = this.matrix.forEach((row, r_index, array) => {
-      //   return array.map((column, c_index) => {
-      //     return array[c_index][r_index]
-      //   })
-      // })
+      if (!this.isGameOver()) {
+        this.addNumber();
+      } else {
+        this.hasLost = true;
+      }
     },
     slideBottom() {
       let newMatrix = this.rotateMatrix(this.matrix).map((row) => {
@@ -115,6 +125,43 @@ export default {
       });
 
       this.matrix = this.rotateMatrix(newMatrix);
+
+      if (!this.isGameOver()) {
+        this.addNumber();
+      } else {
+        this.hasLost = true;
+      }
+    },
+    isGameOver() {
+      // let hasEmpty = false;
+
+      let hasEmpty = this.matrix.some((row) => {
+        return row.some((el) => el === 0);
+      });
+
+      console.log("hasEmpty ", hasEmpty);
+
+      // let rowCanMove = this.matrix.find((row) => {
+      //   return this.isNextTileTheSame(row);
+      // });
+
+      // console.log('row move ', rowCanMove);
+
+      if (!hasEmpty) {
+        console.log("Game over");
+        return true;
+      }
+
+      return false;
+    },
+    isNextTileTheSame(array) {
+      array.forEach((element, index, arr) => {
+        if (element === arr[++index]) {
+          return true;
+        }
+      });
+
+      return false;
     },
   },
   components: {

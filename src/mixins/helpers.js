@@ -9,6 +9,7 @@ export const game_helpers = {
         .map((element, index, arr) => {
           if (element == arr[++index]) {
             arr[index] = 0;
+            this.$store.dispatch('setScore', element * 2)
             return element * 2;
           } else {
             return element;
