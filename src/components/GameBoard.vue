@@ -1,5 +1,5 @@
 <template>
-  <div class="game-board" :class="{'game-over' : hasLost}">
+  <div class="game-board" :class="{ 'game-over': hasLost }">
     <div v-for="(row, row_index) in matrix" :key="row_index" class="game-row">
       <game-tile
         v-for="(tile, index) in row"
@@ -21,6 +21,7 @@ export default {
   name: "gameBoard",
   data: () => ({
     matrix: null,
+    previousMove: null,
     hasWon: false,
     hasLost: false,
   }),
@@ -41,6 +42,9 @@ export default {
         .fill()
         .map(() => Array(4).fill(0));
 
+      this.previousMove = this.matrix;
+      console.log(this.isMatrixTheSame());
+
       // Fill with 2 numbers on random cell
       this.addNumber();
       this.addNumber();
@@ -55,7 +59,7 @@ export default {
       let randomRow = this.generateRandomNumber();
 
       if (this.matrix[randomCol][randomRow] === 0) {
-        this.matrix[randomCol][randomRow] = 2;
+        this.matrix[randomCol][randomRow] = (randomCol > 2) ? 4 : 2;
       } else {
         try {
           this.addNumber();
@@ -134,29 +138,36 @@ export default {
       });
 
       if (!hasEmpty) {
-          let rowCanMove = this.matrix.some((row) => {
-            return this.isNextTileTheSame(row);
-          });
+        let rowCanMove = this.matrix.some((row) => {
+          return this.isNextTileTheSame(row);
+        });
 
-          let colCanMove = this.rotateMatrix(this.matrix).some((row) => {
-            return this.isNextTileTheSame(row);
-          });
+        let colCanMove = this.rotateMatrix(this.matrix).some((row) => {
+          return this.isNextTileTheSame(row);
+        });
 
-          if (!rowCanMove && !colCanMove) {
-            this.hasLost = true;
-            this.$store.dispatch('setBestScore');
-          }
-
-      } else {
+        if (!rowCanMove && !colCanMove) {
+          this.hasLost = true;
+          this.$store.dispatch("setBestScore");
+        }
+      } 
+      else if (!this.isMatrixTheSame()) {
         this.addNumber();
+        this.previousMove = this.matrix;
       }
-
     },
     isNextTileTheSame(array) {
       return array.some((element, index, arr) => {
         if (element === arr[++index]) {
           return true;
         }
+      });
+    },
+    isMatrixTheSame() {
+      return this.matrix.every((row, r_index) => {
+        return row.every((item, c_index) => {
+          return item == this.previousMove[r_index][c_index];
+        });
       });
     },
   },
@@ -198,7 +209,7 @@ button {
 }
 
 .game-over::after {
-  content: 'Game Over';
+  content: "Game Over";
   position: absolute;
   display: flex;
   justify-content: center;
