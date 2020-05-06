@@ -12,6 +12,10 @@
         },
         computed: {
             getValue() {
+                if (this.value == 2048) {
+                    this.$emit('win')
+                }
+
                 return this.value > 0 ? this.value : null
             }
         }

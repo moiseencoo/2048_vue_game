@@ -5,8 +5,10 @@
         v-for="(tile, index) in row"
         :key="row_index + '_' + index"
         :value="tile"
+        v-on:win="hasWon = true"
       ></game-tile>
     </div>
+    <h2 v-if="hasWon">You Win!</h2>
   </div>
 </template>
 
@@ -23,6 +25,7 @@ export default {
       [0, 0, 0, 0],
       [0, 0, 0, 0],
     ],
+    hasWon: false,
   }),
   mixins: [game_helpers],
   created() {
@@ -53,15 +56,19 @@ export default {
       switch (event.keyCode) {
         case 37:
           this.slideLeft();
+          this.addNumber();
           break;
         case 38:
           this.slideTop();
+          this.addNumber();
           break;
         case 39:
           this.slideRight();
+          this.addNumber();
           break;
         case 40:
           this.slideBottom();
+          this.addNumber();
           break;
       }
     },
