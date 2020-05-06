@@ -10,6 +10,7 @@
     </div>
     {{ hasLost }}
     <h2 v-if="hasWon">You Win!</h2>
+    <button @click="initializeGame" >New Game</button>
   </div>
 </template>
 
@@ -41,8 +42,17 @@ export default {
   },
   methods: {
     initializeGame() {
+
+      // Create Empty Matrix
+      this.matrix = Array(4).fill().map(()=>Array(4).fill(0))
+      
+      // Fill with 2 numbers on random cell
       this.addNumber();
       this.addNumber();
+
+      // Clear Score
+      this.$store.dispatch('clearScore');
+
     },
     addNumber() {
       let randomCol = this.generateRandomNumber();
@@ -181,5 +191,20 @@ export default {
   display: flex;
   margin: 15px;
   margin-right: 0;
+}
+
+button {
+  display: block;
+  width: 70%;
+  outline: none;
+  background: #545479;
+  color: #fff;
+  font-size: 16px;
+  text-transform: uppercase;
+  border-radius: 5px;
+  margin: 15px auto;
+  padding: 7px;
+  border: 0;
+  cursor: pointer;
 }
 </style>

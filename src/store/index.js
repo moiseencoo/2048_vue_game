@@ -10,11 +10,17 @@ export default new Vuex.Store({
   mutations: {
     setScore(state, score) {
       state.score += score
+    },
+    clearScore(state) {
+      state.score = 0
     }
   },
   actions: {
     setScore({ commit }, score) {
       commit('setScore', score);
+    },
+    clearScore({ commit }) {
+      commit('clearScore')
     }
   },
   getters: {
