@@ -1,5 +1,5 @@
 <template>
-  <div class="game-board">
+  <div class="game-board" :class="{'game-over' : hasLost}">
     <div v-for="(row, row_index) in matrix" :key="row_index" class="game-row">
       <game-tile
         v-for="(tile, index) in row"
@@ -8,9 +8,8 @@
         v-on:win="hasWon = true"
       ></game-tile>
     </div>
-    {{ hasLost }}
     <h2 v-if="hasWon">You Win!</h2>
-    <button @click="initializeGame" >New Game</button>
+    <button @click="initializeGame">New Game</button>
   </div>
 </template>
 
@@ -21,12 +20,7 @@ import { game_helpers } from "@/mixins/helpers.js";
 export default {
   name: "gameBoard",
   data: () => ({
-    matrix: [
-      [16, 256, 16, 256],
-      [0, 16, 0, 16],
-      [0, 256, 16, 0],
-      [0, 16, 0, 16],
-    ],
+    matrix: null,
     hasWon: false,
     hasLost: false,
   }),
@@ -42,17 +36,19 @@ export default {
   },
   methods: {
     initializeGame() {
-
       // Create Empty Matrix
-      this.matrix = Array(4).fill().map(()=>Array(4).fill(0))
-      
+      this.matrix = Array(4)
+        .fill()
+        .map(() => Array(4).fill(0));
+
       // Fill with 2 numbers on random cell
       this.addNumber();
       this.addNumber();
 
       // Clear Score
-      this.$store.dispatch('clearScore');
+      this.$store.dispatch("clearScore");
 
+      this.hasLost = false;
     },
     addNumber() {
       let randomCol = this.generateRandomNumber();
@@ -61,23 +57,29 @@ export default {
       if (this.matrix[randomCol][randomRow] === 0) {
         this.matrix[randomCol][randomRow] = 2;
       } else {
-        this.addNumber();
+        try {
+          this.addNumber();
+        } catch {
+          this.hasLost = true;
+        }
       }
     },
     userPressedKey(event) {
-      switch (event.keyCode) {
-        case 37:
-          this.slideLeft();
-          break;
-        case 38:
-          this.slideTop();
-          break;
-        case 39:
-          this.slideRight();
-          break;
-        case 40:
-          this.slideBottom();
-          break;
+      if (!this.hasLost) {
+        switch (event.keyCode) {
+          case 37:
+            this.slideLeft();
+            break;
+          case 38:
+            this.slideTop();
+            break;
+          case 39:
+            this.slideRight();
+            break;
+          case 40:
+            this.slideBottom();
+            break;
+        }
       }
     },
     slideLeft() {
@@ -86,11 +88,7 @@ export default {
         return merged.concat(row.fill(0).slice(merged.length, 4));
       });
 
-      if (!this.isGameOver()) {
-        this.addNumber();
-      } else {
-        this.hasLost = true;
-      }
+      this.isGameOver();
     },
     slideRight() {
       this.matrix = this.matrix.map((row) => {
@@ -103,11 +101,7 @@ export default {
           .concat(merged);
       });
 
-      if (!this.isGameOver()) {
-        this.addNumber();
-      } else {
-        this.hasLost = true;
-      }
+      this.isGameOver();
     },
     slideTop() {
       let newMatrix = this.rotateMatrix(this.matrix).map((row) => {
@@ -117,11 +111,7 @@ export default {
 
       this.matrix = this.rotateMatrix(newMatrix);
 
-      if (!this.isGameOver()) {
-        this.addNumber();
-      } else {
-        this.hasLost = true;
-      }
+      this.isGameOver();
     },
     slideBottom() {
       let newMatrix = this.rotateMatrix(this.matrix).map((row) => {
@@ -136,42 +126,37 @@ export default {
 
       this.matrix = this.rotateMatrix(newMatrix);
 
-      if (!this.isGameOver()) {
-        this.addNumber();
-      } else {
-        this.hasLost = true;
-      }
+      this.isGameOver();
     },
     isGameOver() {
-      // let hasEmpty = false;
-
       let hasEmpty = this.matrix.some((row) => {
         return row.some((el) => el === 0);
       });
 
-      console.log("hasEmpty ", hasEmpty);
-
-      // let rowCanMove = this.matrix.find((row) => {
-      //   return this.isNextTileTheSame(row);
-      // });
-
-      // console.log('row move ', rowCanMove);
-
       if (!hasEmpty) {
-        console.log("Game over");
-        return true;
+          let rowCanMove = this.matrix.some((row) => {
+            return this.isNextTileTheSame(row);
+          });
+
+          let colCanMove = this.rotateMatrix(this.matrix).some((row) => {
+            return this.isNextTileTheSame(row);
+          });
+
+          if (!rowCanMove && !colCanMove) {
+            this.hasLost = true;
+          }
+
+      } else {
+        this.addNumber();
       }
 
-      return false;
     },
     isNextTileTheSame(array) {
-      array.forEach((element, index, arr) => {
+      return array.some((element, index, arr) => {
         if (element === arr[++index]) {
           return true;
         }
       });
-
-      return false;
     },
   },
   components: {
@@ -182,6 +167,7 @@ export default {
 
 <style lang="scss" scoped>
 .game-board {
+  position: relative;
   background-color: #d5d5f4;
   border-radius: 5px;
   padding: 1px;
@@ -194,6 +180,7 @@ export default {
 }
 
 button {
+  position: relative;
   display: block;
   width: 70%;
   outline: none;
@@ -206,5 +193,21 @@ button {
   padding: 7px;
   border: 0;
   cursor: pointer;
+  z-index: 20;
+}
+
+.game-over::after {
+  content: 'Game Over';
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.7);
+  color: #333;
+  font-size: 72px;
 }
 </style>
