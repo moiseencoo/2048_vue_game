@@ -4,7 +4,7 @@
             Score <span>{{ getScore }}</span>
         </p>
         <p class="game-score-best">
-            Best Score <span>4096</span>
+            Best Score <span>{{ getBestScore }}</span>
         </p>
     </div>
 </template>
@@ -15,7 +15,7 @@ import { mapGetters } from 'vuex';
     export default {
         name: 'gameScore',
         computed: {
-            ...mapGetters(['getScore'])
+            ...mapGetters(['getScore', 'getBestScore'])
         }
     }
 </script>

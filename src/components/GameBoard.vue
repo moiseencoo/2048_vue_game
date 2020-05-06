@@ -144,6 +144,7 @@ export default {
 
           if (!rowCanMove && !colCanMove) {
             this.hasLost = true;
+            this.$store.dispatch('setBestScore');
           }
 
       } else {
